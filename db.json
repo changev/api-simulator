@@ -1,9 +1,38 @@
 {
-  "posts": [
-    { "id": 1, "title": "json-server", "author": "typicode" }
+  "devices": [
+    {
+      "id": 0,
+      "name": "storage#",
+      "type": "storage",
+      "serialNumber": "SW34MJ",
+      "systemCapacity": "0.7",
+      "status": "ok",
+      "site": "SH",
+      "position": -1,
+      "provisioned": true,
+      "height": 4,
+      "complianceStatus": "compliant"
+    },
+    {
+      "id": 1,
+      "name": "storage#",
+      "type": "storage",
+      "serialNumber": "SW34MJ",
+      "systemCapacity": "0.7",
+      "status": "ok",
+      "site": "SH",
+      "position": -1,
+      "provisioned": true,
+      "height": 4,
+      "complianceStatus": "compliant"
+    }
   ],
-  "comments": [
-    { "id": 1, "body": "some comment", "postId": 1 }
-  ],
-  "profile": { "name": "typicode" }
+  "users": [
+    {
+      "username": "admin"
+    },
+    {
+      "username": "katalist"
+    }
+  ]
 }

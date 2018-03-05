@@ -6,6 +6,8 @@ const getFullURL = require('./get-full-url')
 const utils = require('../utils')
 const delay = require('./delay')
 
+const keywordMapping = require('../../../mapping.json')
+
 module.exports = (db, name, opts) => {
   // Create router
   const router = express.Router()
@@ -54,23 +56,22 @@ module.exports = (db, name, opts) => {
 
     // Remove q, _start, _end, ... from req.query to avoid filtering using those
     // parameters
-    let q = req.query.q
-    let _start = req.query._start
-    let _end = req.query._end
-    let _page = req.query._page
-    let _sort = req.query._sort
-    let _order = req.query._order
-    let _limit = req.query._limit
-    let _embed = req.query._embed
-    let _expand = req.query._expand
-    delete req.query.q
-    delete req.query._start
-    delete req.query._end
-    delete req.query._sort
-    delete req.query._order
-    delete req.query._limit
-    delete req.query._embed
-    delete req.query._expand
+    let q = req.query[keywordMapping.q] || req.query.q
+    let _start = req.query[keywordMapping._start] ||req.query._start
+    let _end = req.query[keywordMapping._end] || req.query._end
+    let _page = req.query[keywordMapping._page] || req.query._page
+    let _sort = req.query[keywordMapping._sort] || req.query._sort
+    let _order = req.query[keywordMapping._order] || req.query._order
+    let _limit = req.query[keywordMapping._limit] || req.query._limit
+    let _embed = req.query[keywordMapping._embed] || req.query._embed
+    let _expand = req.query[keywordMapping._expand] || req.query._expand
+    delete req.query[keywordMapping.q] || req.query.q
+    delete req.query[keywordMapping._start] ||req.query._start
+    delete req.query[keywordMapping._end] || req.query._end
+    delete req.query[keywordMapping._sort] || req.query._sort
+    delete req.query[keywordMapping._order] || req.query._order
+    delete req.query[keywordMapping._limit] || req.query._limit
+    delete req.query[keywordMapping._expand] || req.query._expand
 
     // Automatically delete query parameters that can't be found
     // in the database
