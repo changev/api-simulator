@@ -35,10 +35,9 @@ app.post('/login', (req, res) => {
   }
 })
 
-console.log(middlewares)
 app.use(middlewares)
 app.use(authValidator)
-// app.use(rewriter)
+app.use(rewriter)
 app.use(router)
 
 var httpServer = http.createServer(app)
