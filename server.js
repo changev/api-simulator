@@ -35,6 +35,14 @@ app.post('/login', (req, res) => {
   }
 })
 
+var db = require(path.join(__dirname, 'db.json'))
+app.get('/inventory/devices/count_by_type', (req, res) => {
+  res.status(200).send(db.devicesTypeCounts[0]);
+})
+app.get('/inventory/devices/count_by_status', (req, res) => {
+  res.status(200).send(db.devicesStatusCounts[0]);
+})
+
 app.use(middlewares)
 app.use(authValidator)
 app.use(rewriter)
