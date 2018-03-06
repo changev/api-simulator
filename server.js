@@ -10,6 +10,10 @@ var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
 
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(middlewares)
+
 // customized middlewares
 function authValidator (req, res, next) {
   if(req.url === "/login" || req.headers['token']){
@@ -18,9 +22,12 @@ function authValidator (req, res, next) {
     res.sendStatus(401);
   }
 }
-
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(authValidator)
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 // customized routes
 // login
@@ -43,8 +50,6 @@ app.get('/inventory/devices/count_by_status', (req, res) => {
   res.status(200).send(db.devicesStatusCounts[0]);
 })
 
-app.use(middlewares)
-app.use(authValidator)
 app.use(rewriter)
 app.use(router)
 
