@@ -71,7 +71,7 @@ app.use(rewriter)
 app.use(router)
 
 var httpServer = http.createServer(app)
-httpServer.listen(9998, () => {
+httpServer.listen(9999, () => {
   console.log('JSON Server is running')
 })
 
