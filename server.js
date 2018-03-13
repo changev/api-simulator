@@ -7,6 +7,7 @@ const app = jsonServer.create()
 const router = jsonServer.router(path.join(__dirname, 'db.json'))
 const rewriter = jsonServer.rewriter(require(path.join(__dirname, 'routes.json')))
 const middlewares = jsonServer.defaults()
+const XMLHttpRequest = require('xmlhttprequest')
 var bodyParser = require('body-parser');
 var multer = require('multer'); // v1.0.5
 var upload = multer(); // for parsing multipart/form-data
@@ -17,12 +18,13 @@ app.use(middlewares)
 
 // customized middlewares
 function authValidator (req, res, next) {
-  if(req.url === "/login" || req.headers['token']){
+  if(req.url === "/login" || req.url.includes("/users") || req.headers['token']){
     next()
   } else {
     res.sendStatus(401);
   }
 }
+
 app.use(authValidator)
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -34,21 +36,33 @@ app.use(function(req, res, next) {
 // login
 app.post('/login', (req, res) => {
   var params = req.body;
-  var db = require(path.join(__dirname, 'db.json'));
-  var users = db.users;
+  var users = reloadJsonData().users;
+  var guard = true;
   for (var i = 0; i < users.length; i++) {
-    if (params && params.username === user[i].username && params.password === users[i].password){
-       res.status(200).send({'token': md5(user[i].username+user[i].password)});
-       return;
+    if (params && params.username === users[i].username && params.password === users[i].password){
+       guard = false;
+       res.status(200).send({'token': md5(users[i].username+users[i].password)});
      }
   }
-  res.status(401).send({'msg': 'Wrong username or password'});
+  if(guard) res.status(400).send({'msg': 'Wrong username or password'});
+})
+
+app.post('/resetpassword', (req, res) => {
+  var params = req.body;
+  var users = reloadJsonData().users;
+  var guard = true;
+  for (var i = 0; i < users.length; i++) {
+    if (params && params.email=== users[i].email){
+       guard = false;
+       res.status(200).send();
+     }
+  }
+  if(guard) res.status(404).send({'msg': 'dont find related email'});
 })
 
 app.get('/users/current', (req, res) => {
   var token = req.headers.token;
-  var db = require(path.join(__dirname, 'db.json'));
-  var users = db.users;
+  var users = reloadJsonData().users;
   for (var i = 0; i < users.length; i++) {
     var thisToken = md5(users[i].username + users[i].password);
     if(thisToken === token){
@@ -59,11 +73,12 @@ app.get('/users/current', (req, res) => {
   res.status(200).send({});
 })
 
-var db = require(path.join(__dirname, 'db.json'))
 app.get('/inventory/devices/count_by_type', (req, res) => {
+  var db = require(path.join(__dirname, 'db.json'))
   res.status(200).send(db.devicesTypeCounts[0]);
 })
 app.get('/inventory/devices/count_by_status', (req, res) => {
+  var db = require(path.join(__dirname, 'db.json'))
   res.status(200).send(db.devicesStatusCounts[0]);
 })
 
@@ -81,3 +96,10 @@ io.on('connection', (socketServer) => {
     process.exit(0);
   });
 });
+
+function reloadJsonData(){
+  var fs = require('fs');
+  var data = fs.readFileSync(path.join(__dirname, 'db.json'), 'utf8');
+  var obj = JSON.parse(data);
+  return obj;
+}
